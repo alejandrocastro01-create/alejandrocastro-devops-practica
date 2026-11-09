@@ -13,10 +13,13 @@ El proyecto incluye además:
 
 ## Estructura
 
-- `main.py`: endpoints de la API.
-- `esquemas.py`: modelos de entrada y salida con Pydantic.
-- `models/`: clases Usuario, Producto y Pedido.
-- `services/`: lógica de la tienda y excepciones.
+- `src/main.py`: endpoints de la API.
+- `src/esquemas.py`: modelos de entrada y salida con Pydantic.
+- `src/models/`: clases Usuario, Producto y Pedido.
+- `src/services/`: lógica de la tienda y excepciones.
+- `src/cliente_python/`: cliente que consume la API.
+- `src/frontend/`: interfaz con Streamlit.
+- `dockerfile`, `.dockerignore` y `requirements.txt`: configuración de Docker y dependencias.
 
 ## Endpoints principales
 
@@ -24,16 +27,47 @@ El proyecto incluye además:
 - `POST /productos`, `GET /productos`, `GET /productos/{producto_id}`, `DELETE /productos/{producto_id}`
 - `POST /pedidos`, `GET /usuarios/{cliente_id}/pedidos`
 
-## Cómo ejecutarlo
+## Ejecución en local
 
-En local:
+```
+pip install -r requirements.txt
+cd src
+uvicorn main:app --reload
+```
 
-    pip install -r requirements.txt
-    uvicorn main:app --reload
+## Docker
 
-Con Docker:
+### Construir la imagen
 
-    docker build -t tienda-api .
-    docker run -p 8000:8000 tienda-api
+```
+docker build -t TU_USUARIO/tienda-api:1.0 .
+```
 
-La documentación interactiva queda en http://localhost:8000/docs
+### Ejecutar el contenedor
+
+```
+docker run -d -p 8000:8000 --name tienda TU_USUARIO/tienda-api:1.0
+```
+
+- `-d` lo ejecuta en segundo plano.
+- `-p 8000:8000` conecta el puerto 8000 de tu ordenador con el del contenedor.
+- Para pararlo: `docker stop tienda`. Para ver lo que imprime: `docker logs tienda`.
+
+### Variables de entorno
+
+La API no necesita ninguna. El cliente de Python usa `BASE_URL` para saber dónde está la API (por defecto `http://localhost:8000`).
+
+### Pruebas
+
+Al arrancar, `docker logs tienda` debe mostrar `Uvicorn running on http://0.0.0.0:8000`. Después:
+
+- Abre http://localhost:8000/docs y prueba los endpoints desde Swagger.
+- `GET http://localhost:8000/productos` devuelve la lista de productos (vacía al principio).
+- Con la API en marcha, `python src/cliente_python/cliente.py` crea usuarios, productos y un pedido de ejemplo.
+
+### Descargar la imagen de Docker Hub
+
+```
+docker pull TU_USUARIO/tienda-api:1.0
+docker run -d -p 8000:8000 TU_USUARIO/tienda-api:1.0
+```
