@@ -1,6 +1,6 @@
-fastapi
-uvicorn
-pydantic
-email-validator
-requests
-streamlit
+fastapi==0.143.2
+uvicorn==0.54.0
+pydantic==2.14.1
+email-validator==2.3.0
+requests==2.34.2
+streamlit==1.66.1
