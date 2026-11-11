@@ -7,8 +7,8 @@
 API REST de una tienda online desarrollada en Python con FastAPI. Permite gestionar usuarios (clientes y administradores), productos (electrónica y ropa) y pedidos, comprobando que el usuario sea cliente y que haya stock suficiente antes de crear un pedido.
 
 El proyecto incluye además:
-- Un cliente en Python (`cliente_python/cliente.py`) que consume la API mediante peticiones HTTP.
-- Un frontend hecho con Streamlit (`frontend/app.py`).
+- Un cliente en Python (`src/cliente_python/cliente.py`) que consume la API mediante peticiones HTTP.
+- Un frontend hecho con Streamlit (`src/frontend/app.py`).
 - Un `dockerfile` para ejecutar la API en un contenedor.
 
 ## Estructura
