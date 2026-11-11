@@ -40,13 +40,13 @@ uvicorn main:app --reload
 ### Construir la imagen
 
 ```
-docker build -t TU_USUARIO/tienda-api:1.0 .
+docker build -t alejandrocastrorodriguez/tienda-api:1.0 .
 ```
 
 ### Ejecutar el contenedor
 
 ```
-docker run -d -p 8000:8000 --name tienda TU_USUARIO/tienda-api:1.0
+docker run -d -p 8000:8000 --name tienda alejandrocastrorodriguez/tienda-api:1.0
 ```
 
 - `-d` lo ejecuta en segundo plano.
@@ -68,6 +68,6 @@ Al arrancar, `docker logs tienda` debe mostrar `Uvicorn running on http://0.0.0.
 ### Descargar la imagen de Docker Hub
 
 ```
-docker pull TU_USUARIO/tienda-api:1.0
-docker run -d -p 8000:8000 TU_USUARIO/tienda-api:1.0
+docker pull alejandrocastrorodriguez/tienda-api:1.0
+docker run -d -p 8000:8000 alejandrocastrorodriguez/tienda-api:1.0
 ```
