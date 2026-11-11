@@ -1,0 +1,19 @@
+#Git
+.git
+.gitignore
+
+#Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+#Editor
+.vscode/
+.idea/
+
+#Secretos y otros
+.env
+*.zip
+dockerfile
+.dockerignore
