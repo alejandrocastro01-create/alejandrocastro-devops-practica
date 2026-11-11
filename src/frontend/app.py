@@ -1,14 +1,16 @@
 #Autor: Alejandro Castro Rodriguez
 #Frontend de la tienda hecho en Python con Streamlit. No importa nada del servidor, todo va por peticiones HTTP
-#Se arranca con: python -m streamlit run frontend_python/app.py
+#Se arranca con: python -m streamlit run src/frontend/app.py
 #Importacion de librerias
+import os
 import requests
 import streamlit as st
 
 #Direccion base de la API por defecto, se cambia en la caja de arriba de la pagina
 #Pongo 127.0.0.1 y no localhost porque en Windows localhost tarda 2 segundos en cada peticion
 #(primero lo intenta por IPv6 y uvicorn solo escucha en IPv4), y la pagina hace varias peticiones cada vez
-BASE_URL= 'http://127.0.0.1:8000'
+#Si existe la variable de entorno API_URL uso esa (en docker compose apunta al contenedor de la API)
+BASE_URL= os.environ.get('API_URL', 'http://127.0.0.1:8000')
 
 #Segundos que espero como maximo a que la API responda
 TIEMPO_ESPERA= 10

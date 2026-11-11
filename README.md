@@ -9,7 +9,7 @@ API REST de una tienda online desarrollada en Python con FastAPI. Permite gestio
 El proyecto incluye además:
 - Un cliente en Python (`src/cliente_python/cliente.py`) que consume la API mediante peticiones HTTP.
 - Un frontend hecho con Streamlit (`src/frontend/app.py`).
-- Un `dockerfile` para ejecutar la API en un contenedor.
+- Un `dockerfile` para ejecutar la API en un contenedor, un `dockerfile.frontend` para el frontend y un `docker-compose.yml` que levanta los dos.
 
 ## Estructura
 
@@ -19,7 +19,10 @@ El proyecto incluye además:
 - `src/services/`: lógica de la tienda y excepciones.
 - `src/cliente_python/`: cliente que consume la API.
 - `src/frontend/`: interfaz con Streamlit.
-- `dockerfile`, `.dockerignore` y `requirements.txt`: configuración de Docker y dependencias.
+- `dockerfile` y `requirements.txt`: imagen y dependencias de la API.
+- `dockerfile.frontend` y `requirements-frontend.txt`: imagen y dependencias del frontend.
+- `docker-compose.yml`: levanta la API y el frontend juntos.
+- `.dockerignore`: ficheros que no se copian al construir las imágenes.
 
 ## Endpoints principales
 
@@ -30,9 +33,15 @@ El proyecto incluye además:
 ## Ejecución en local
 
 ```
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-frontend.txt
 cd src
 uvicorn main:app --reload
+```
+
+En otra terminal, desde la raíz del repositorio, el frontend:
+
+```
+streamlit run src/frontend/app.py
 ```
 
 ## Docker
@@ -40,13 +49,13 @@ uvicorn main:app --reload
 ### Construir la imagen
 
 ```
-docker build -t alejandrocastrorodriguez/tienda-api:1.0 .
+docker build -t alejandrocastrorodriguez/tienda-api:1.1 .
 ```
 
 ### Ejecutar el contenedor
 
 ```
-docker run -d -p 8000:8000 --name tienda alejandrocastrorodriguez/tienda-api:1.0
+docker run -d -p 8000:8000 --name tienda alejandrocastrorodriguez/tienda-api:1.1
 ```
 
 - `-d` lo ejecuta en segundo plano.
@@ -55,7 +64,7 @@ docker run -d -p 8000:8000 --name tienda alejandrocastrorodriguez/tienda-api:1.0
 
 ### Variables de entorno
 
-La API no necesita ninguna. El cliente de Python usa `BASE_URL` para saber dónde está la API (por defecto `http://localhost:8000`).
+La API no necesita ninguna. El cliente de Python usa `BASE_URL` y el frontend usa `API_URL` para saber dónde está la API (por defecto `http://localhost:8000` y `http://127.0.0.1:8000`).
 
 ### Pruebas
 
@@ -68,6 +77,47 @@ Al arrancar, `docker logs tienda` debe mostrar `Uvicorn running on http://0.0.0.
 ### Descargar la imagen de Docker Hub
 
 ```
-docker pull alejandrocastrorodriguez/tienda-api:1.0
-docker run -d -p 8000:8000 alejandrocastrorodriguez/tienda-api:1.0
+docker pull alejandrocastrorodriguez/tienda-api:1.1
+docker run -d -p 8000:8000 alejandrocastrorodriguez/tienda-api:1.1
+```
+
+La versión `1.0` es la anterior: incluía también las librerías del frontend (streamlit) y ocupaba unos 835 MB. En la `1.1` la API solo instala sus dependencias y ocupa unos 219 MB.
+
+## Docker Compose (API + frontend)
+
+`docker-compose.yml` define dos servicios:
+
+| Servicio | Imagen | Puerto |
+|---|---|---|
+| `api` | `alejandrocastrorodriguez/tienda-api:1.1` | 8000 |
+| `frontend` | `alejandrocastrorodriguez/tienda-frontend:1.0` | 8501 |
+
+El frontend recibe la variable `API_URL=http://api:8000`: dentro de la red de compose cada servicio se llama por su nombre, así que el frontend encuentra la API en `http://api:8000`.
+
+### Construir y levantar
+
+```
+docker compose up -d --build
+```
+
+### Pruebas
+
+- `docker compose ps` muestra los dos contenedores en estado `Up`.
+- http://localhost:8000/ devuelve `{"mensaje": "La tienda online funciona"}`.
+- http://localhost:8501 abre el frontend. Arriba aparece `http://api:8000` como dirección de la API y desde ahí se pueden crear y listar productos, usuarios y pedidos.
+- `docker compose exec api whoami` y `docker compose exec frontend whoami` responden `appuser` (no se ejecutan como root).
+- `docker compose logs` muestra lo que imprime cada contenedor.
+
+### Parar
+
+```
+docker compose down
+```
+
+### Descargar las imágenes de Docker Hub
+
+```
+docker pull alejandrocastrorodriguez/tienda-api:1.1
+docker pull alejandrocastrorodriguez/tienda-frontend:1.0
+docker compose up -d
 ```
